@@ -1,0 +1,242 @@
+########################
+# $Id: setup.txt 33835 2010-06-02 06:50:16Z neoblack $
+########################
+
+plugin.tx_feuserregistration {
+	_LOCAL_LANG.default {
+		error_validator_required_email = Bitte geben Sie eine E-Mail-Adresse ein
+		error_validator_email_email = Bitte geben Sie eine E-Mail-Adresse ein
+	}
+	additionalLocalLanguageFiles {
+		# Example:
+		# tx_myextension = EXT:myextension/lang/locallang_fields.xml
+	}
+	pages {
+		register	=
+		confirm		=
+		edit		=
+		storagePid	=
+	}
+	global {
+		requiredString = *
+		useRequiredStringInLabel = 0
+		useFieldAsUsername = email
+		# required
+		userGroupsAfterRegistration =
+		# required
+		userGroupsAfterConfirmation =
+		# optional
+		userGroupsAfterUpdate =
+		# optional
+		userGroupsAfterUpdateConfirmation =
+		confirmationOnUpdateFields = email
+		emailConfirmation = 1
+		adminConfirmation = 0
+		adminEmail {
+			email =
+			name  =
+			sender {
+				name =
+				email =
+			}
+			onRegister = 1
+			onConfirmation = 1
+			onUpdate = 1
+		}
+		userEmail {
+			email = ###FIELD_email###
+			sender {
+				name =
+				email =
+			}
+			# onRegister will be ignored if plugin.tx_feuserregistration.global.emailConfirmation is set
+			onRegister = 1
+			onConfirmation = 1
+			# onUpdate will be ignored if plugin.tx_feuserregistration.global.confirmationOnUpdateFields is set
+			onUpdate = 0
+		}
+	}
+	templates {
+		register	= EXT:feuserregistration/resources/template_register.html
+		confirm		= EXT:feuserregistration/resources/template_confirm.html
+		edit		= EXT:feuserregistration/resources/template_edit.html
+		error		= EXT:feuserregistration/resources/template_error.html
+		mails		= EXT:feuserregistration/resources/template_mails.html
+	}
+	defaultWraps {
+		# all wraps are stdWrap's
+		field.wrap = <span class="field">|</span>
+		label.wrap = <label for="tx-feuserregistration-field-###FIELDNAME###">|</label>
+		error.wrap = <span class="error">|</span>
+	}
+	fields {
+		# default validators:
+		# between, boolean, dateformat, email, float, int, ip, ipv4, ipv6, length, regexp, required, url 
+		# special validators:
+		# equalField, equalValue, uniqueInDb,uniqueInPid
+		# field types:
+		# text, password, textarea, TCA
+		username {
+			type = text
+			validators = required,uniqueInDb
+			validatorOptions {
+				uniqueInDb.disableEnableFields = 1
+			}
+			# labelWrap = stdWrap
+			# fieldWrap = stdWrap
+			# errorWrap = stdWrap
+		}
+		email {
+			type = text
+			validators  = email
+		}
+		password {
+			type = password
+			validators = required,length
+			validatorOptions {
+				length {
+					min = 6
+				}
+			}
+			transformers {
+				db = saltedpasswords,t3sec_saltedpw
+			}
+		}
+		password_confirm {
+			type = password
+			minLength = 3
+			maxLength = 30
+			validators  = required,equalField
+			validatorOptions {
+				equalField {
+					fieldList = password
+				}
+			}
+		}
+		# avatar image of the regular fe_user record
+		image {
+			type = file
+			uploadFolder = uploads/pics
+			validators = file
+			validatorOptions {
+				file {
+					types = gif,jpg,png
+				}
+			}
+			transformers {
+				html = image
+			}
+			transformerOptions {
+				image {
+					uploadFolder = uploads/pics/
+					file {
+						maxW = 50px
+						maxH = 100px
+					}
+				}
+			}
+		}
+		tx_feuserregistration_gender {
+			type = TCA
+		}
+		tx_feuserregistration_firstname {
+			type = text
+		}
+		tx_feuserregistration_lastname {
+			type = text
+		}
+		tx_feuserregistration_birthday {
+			type = text
+			validators = required,dateformat
+			validatorOptions {
+				dateformat {
+					format = %d.%m.%Y
+				}
+			}
+			transformers {
+				db = timestamp
+				html = date
+			}
+			transformerOptions {
+				timestamp {
+					inFormat = %d.%m.%Y
+				}
+				date {
+					format = %d.%m.%Y
+				}
+			}
+		}
+		address {
+			type = text
+			validators = required
+		}
+		zip {
+			type = text
+			validators  = required,length
+			validatorOptions {
+				length {
+					min = 5
+					max = 5
+				}
+			}
+		}
+		city {
+			type = text
+			validators = required
+		}
+		country {
+			type = text
+			validators = required
+		}
+		country_static {
+			type = static_info_tables
+			# staticType: LANGUAGES, SUBDIVISIONS, CURRENCIES, COUNTRIES
+			staticType = COUNTRIES
+			# CSSClassName = 
+			# countryCode = 
+			# submitFlag = 
+			# title =
+			# where = 
+			# lang =
+			# local =
+		}
+		tx_feuserregistration_test {
+			type = TCA
+		}
+		usergroup {
+			type = TCA
+		}
+	}
+	register {
+		step1 {
+			subpart = template_step1
+			fields = username,email,password,password_confirm
+		}
+		step2 {
+			subpart = template_step2
+			fields = tx_feuserregistration_gender,tx_feuserregistration_firstname,tx_feuserregistration_lastname,tx_feuserregistration_birthday,address,zip,city,country
+		}
+		preview {
+			subpart = template_preview
+		}
+		success {
+			subpart = template_success
+		}
+	}
+	edit {
+		step1 {
+			subpart = template_step1
+			fields = username,email,password,password_confirm
+		}
+		step2 {
+			subpart = template_step2
+			fields = tx_feuserregistration_gender,tx_feuserregistration_firstname,tx_feuserregistration_lastname,tx_feuserregistration_birthday,address,zip,city,country
+		}
+		preview {
+			subpart = template_preview
+		}
+		success {
+			subpart = template_success
+		}
+	}
+}
